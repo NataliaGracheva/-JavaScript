@@ -22,12 +22,12 @@ class Vector {
 }
 
 // Пример кода для Vector
-const start = new Vector(30, 50);
-const moveTo = new Vector(5, 10);
-const finish = start.plus(moveTo.times(2));
+// const start = new Vector(30, 50);
+// const moveTo = new Vector(5, 10);
+// const finish = start.plus(moveTo.times(2));
 
-console.log(`Исходное расположение: ${start.x}:${start.y}`);
-console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
+// console.log(`Исходное расположение: ${start.x}:${start.y}`);
+// console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
 // Результат выполнения кода:
 // Исходное расположение: 30:50
 // Текущее расположение: 40:70
@@ -79,34 +79,34 @@ class Actor {
 }
 
 // Пример кода для Actor
-const items = new Map();
-const player = new Actor();
-items.set('Игрок', player);
-items.set('Первая монета', new Actor(new Vector(10, 10)));
-items.set('Вторая монета', new Actor(new Vector(15, 5)));
+// const items = new Map();
+// const player = new Actor();
+// items.set('Игрок', player);
+// items.set('Первая монета', new Actor(new Vector(10, 10)));
+// items.set('Вторая монета', new Actor(new Vector(15, 5)));
 
-function position(item) {
-  return ['left', 'top', 'right', 'bottom']
-    .map(side => `${side}: ${item[side]}`)
-    .join(', ');
-}
+// function position(item) {
+//   return ['left', 'top', 'right', 'bottom']
+//     .map(side => `${side}: ${item[side]}`)
+//     .join(', ');
+// }
 
-function movePlayer(x, y) {
-  player.pos = player.pos.plus(new Vector(x, y));
-}
+// function movePlayer(x, y) {
+//   player.pos = player.pos.plus(new Vector(x, y));
+// }
 
-function status(item, title) {
-  console.log(`${title}: ${position(item)}`);
-  if (player.isIntersect(item)) {
-    console.log(`Игрок подобрал ${title}`);
-  }
-}
+// function status(item, title) {
+//   console.log(`${title}: ${position(item)}`);
+//   if (player.isIntersect(item)) {
+//     console.log(`Игрок подобрал ${title}`);
+//   }
+// }
 
-items.forEach(status);
-movePlayer(10, 10);
-items.forEach(status);
-movePlayer(5, -5);
-items.forEach(status);
+// items.forEach(status);
+// movePlayer(10, 10);
+// items.forEach(status);
+// movePlayer(5, -5);
+// items.forEach(status);
 // Результат работы примера:
 // Игрок: left: 0, top: 0, right: 1, bottom: 1
 // Первая монета: left: 10, top: 10, right: 11, bottom: 11
@@ -217,47 +217,47 @@ class Level {
 }
 
 // Пример кода для Level
-const grid = [
-  [undefined, undefined],
-  ['wall', 'wall']
-];
+// const grid = [
+//   [undefined, undefined],
+//   ['wall', 'wall']
+// ];
 
-function MyCoin(title) {
-  this.type = 'coin';
-  this.title = title;
-}
-MyCoin.prototype = Object.create(Actor);
-MyCoin.constructor = MyCoin;
+// function MyCoin(title) {
+//   this.type = 'coin';
+//   this.title = title;
+// }
+// MyCoin.prototype = Object.create(Actor);
+// MyCoin.constructor = MyCoin;
 
-const goldCoin = new MyCoin('Золото');
-const bronzeCoin = new MyCoin('Бронза');
-const player2 = new Actor();
-const fireball = new Actor();
+// const goldCoin = new MyCoin('Золото');
+// const bronzeCoin = new MyCoin('Бронза');
+// const player2 = new Actor();
+// const fireball = new Actor();
 
-const level = new Level(grid, [goldCoin, bronzeCoin, player2, fireball]);
+// const level = new Level(grid, [goldCoin, bronzeCoin, player2, fireball]);
 
-level.playerTouched('coin', goldCoin);
-level.playerTouched('coin', bronzeCoin);
+// level.playerTouched('coin', goldCoin);
+// level.playerTouched('coin', bronzeCoin);
 
-if (level.noMoreActors('coin')) {
-  console.log('Все монеты собраны');
-  console.log(`Статус игры: ${level.status}`);
-}
+// if (level.noMoreActors('coin')) {
+//   console.log('Все монеты собраны');
+//   console.log(`Статус игры: ${level.status}`);
+// }
 
-const obstacle = level.obstacleAt(new Vector(1, 1), player2.size);
-if (obstacle) {
-  console.log(`На пути препятствие: ${obstacle}`);
-}
+// const obstacle = level.obstacleAt(new Vector(1, 1), player2.size);
+// if (obstacle) {
+//   console.log(`На пути препятствие: ${obstacle}`);
+// }
 
-const otherActor = level.actorAt(player2);
-if (otherActor === fireball) {
-  console.log('Пользователь столкнулся с шаровой молнией');
-}
+// const otherActor = level.actorAt(player2);
+// if (otherActor === fireball) {
+//   console.log('Пользователь столкнулся с шаровой молнией');
+// }
 // Результат выполнения:
 // Все монеты собраны
 // Статус игры: won
 // На пути препятствие: wall 
 // Пользователь столкнулся с шаровой молнией
 
-// 2. Player is not defined!!!!!
+
 
