@@ -64,7 +64,6 @@ class Actor {
   get type() {
     return 'actor';
   }
-  // !!!
   isIntersect(actor) {
     if (!actor || !(actor instanceof Actor)) {
       throw new Error(`Необходим объект типа Actor`);
@@ -144,7 +143,6 @@ class Level {
   isFinished() {
     return (this.status !== null) && (this.finishDelay < 0);
   }
-  /// !!!
   actorAt(actor) {
     if (!actor || !(actor instanceof Actor)) {
       throw new Error('Необходим объект типа Actor');
@@ -157,7 +155,6 @@ class Level {
     }
     return undefined;
   }
-  // !!!
   obstacleAt(pos, size) {
     if (!pos || !(pos instanceof Vector) || !size || !(size instanceof Vector)) {
       throw new Error('Нужен объект типа Vector');
@@ -199,7 +196,6 @@ class Level {
     }
     return true;
   }
-  // !!!
   playerTouched(type, actor) {
     if (this.status != null) {
       return;
@@ -259,5 +255,233 @@ class Level {
 // На пути препятствие: wall 
 // Пользователь столкнулся с шаровой молнией
 
+// 3. Парсер уровня
+class LevelParser {
+  constructor(dictionary) {
+    this.dictionary = dictionary;
+  }
 
+  actorFromSymbol(symbol) {
+    if (symbol && this.dictionary) {
+      return this.dictionary[symbol];
+    }
+  }
+  obstacleFromSymbol(symbol) {
+    const symbols = { 'x': 'wall', '!': 'lava' };
+    return symbols[symbol];
+  }
+  createGrid(strings) {
+    const array = [];
+    let i = 0;
 
+    for (const string of strings) {
+      array[i] = [];
+      for (let j = 0; j < string.length; j++) {
+        const symbol = string.charAt(j);
+        if (symbol === 'x' || symbol === '!') {
+          array[i].push(this.obstacleFromSymbol(symbol));
+        } else {
+          array[i].push(undefined);
+        }
+      }
+      i++;
+    }
+
+    return array;
+  }
+  createActors(strings) {
+    const array = [];
+    let j = 0;
+
+    for (let k = 0; k < strings.length; k++) {
+      const string = strings[k];
+      for (let i = 0; i < string.length; i++) {
+        const symbol = string.charAt(i);
+        const actorCtr = this.actorFromSymbol(symbol);
+        if (typeof actorCtr === 'function') {
+          const actor = new actorCtr();
+          if (actor instanceof Actor) {
+            array[j] = new actorCtr();
+            array[j].pos = new Vector(i, k);
+            j++;
+          }
+        }
+      }
+    }
+
+    return array;
+  }
+  parse(strings) {
+    return new Level(this.createGrid(strings), this.createActors(strings));
+  }
+}
+//Пример использования для LevelParser
+// const plan = [
+//   ' @ ',
+//   'x!x'
+// ];
+
+// const actorsDict = Object.create(null);
+// actorsDict['@'] = Actor;
+
+// const parser = new LevelParser(actorsDict);
+// const level3 = parser.parse(plan);
+
+// level3.grid.forEach((line, y) => {
+//   line.forEach((cell, x) => console.log(`(${x}:${y}) ${cell}`));
+// });
+
+// level3.actors.forEach(actor => console.log(`(${actor.pos.x}:${actor.pos.y}) ${actor.type}`));
+// Результат выполнения кода:
+// (0:0) undefined
+// (1:0) undefined
+// (2:0) undefined 
+// (0:1) wall
+// (1:1) lava 
+// (2:1) wall 
+// (1:0) actor
+
+// 4. Игрок
+class Player extends Actor {
+  constructor(pos = new Vector(0, 0)) {
+    pos = pos.plus(new Vector(0, -0.5));
+    super(pos, new Vector(0.8, 1.5), new Vector(0, 0));
+  }
+
+  get type() {
+    return 'player';
+  }
+}
+
+// 5. Движущиеся объекты игрового поля
+// Шаровая молния
+class Fireball extends Actor {
+  constructor(pos = new Vector(0, 0), speed = new Vector(0, 0)) {
+    super(pos, new Vector(1, 1), speed);
+  }
+
+  get type() {
+    return 'fireball';
+  }
+  getNextPosition(time = 1) {
+    return this.pos.plus(this.speed.times(time));
+  }
+  handleObstacle() {
+    this.speed = this.speed.times(-1);
+  }
+  act(time, level) {
+    const nextPos = this.getNextPosition(time);
+    if (level.obstacleAt(nextPos, this.size)) {
+      this.handleObstacle();
+    } else {
+      this.pos = nextPos;
+    }
+  }
+}
+
+// Пример использования
+// const time = 5;
+// const speed = new Vector(1, 0);
+// const position4 = new Vector(5, 5);
+
+// const ball = new Fireball(position4, speed);
+
+// const nextPosition = ball.getNextPosition(time);
+// console.log(`Новая позиция: ${nextPosition.x}: ${nextPosition.y}`);
+
+// ball.handleObstacle();
+// console.log(`Текущая скорость: ${ball.speed.x}: ${ball.speed.y}`);
+// Результат работы кода:
+// Новая позиция: 10: 5
+// Текущая скорость: -1: 0
+
+// Горизонтальная шаровая молния
+class HorizontalFireball extends Fireball {
+  constructor(pos = new Vector(0, 0)) {
+    super(pos, new Vector(2, 0));
+  }
+}
+
+// Вертикальная шаровая молния
+class VerticalFireball extends Fireball {
+  constructor(pos = new Vector(0, 0)) {
+    super(pos, new Vector(0, 2));
+  }
+}
+
+// Огненный дождь
+class FireRain extends Fireball {
+  constructor(pos = new Vector(0, 0)) {
+    super(pos, new Vector(0, 3));
+    this.initPos = pos;
+  }
+
+  get type() {
+    return 'firerain';
+  }
+
+  handleObstacle() {
+    this.pos = this.initPos;
+  }
+}
+
+// Монета
+class Coin extends Actor {
+  constructor(pos = new Vector(0, 0)) {
+  	pos = pos.plus(new Vector(0.2, 0.1));
+    super(pos, new Vector(0.6, 0.6));
+    this.springSpeed = 8;
+    this.springDist = 0.07;
+    this.spring = Math.random() * Math.PI * 2;
+  }
+
+  get type() {
+    return 'coin';
+  }
+  updateSpring(time = 1) {
+    this.spring += this.springSpeed * time;
+  }
+  getSpringVector() {
+    return new Vector(0, Math.sin(this.spring) * this.springDist);
+  }
+  getNextPosition(time = 1) {
+    this.updateSpring(time);
+    return this.pos.plus(this.getSpringVector());
+  }
+  act(time) {
+    this.pos = this.getNextPosition(time);
+  }
+}
+
+// runGame
+const schemas = [
+  [
+    '         ',
+    '         ',
+    '    =    ',
+    '       o ',
+    '     !xxx',
+    ' @       ',
+    'xxx!     ',
+    '         '
+  ],
+  [
+    '      v  ',
+    '    v    ',
+    '  v      ',
+    '        o',
+    '        x',
+    '@   x    ',
+    'x        ',
+    '         '
+  ]
+];
+const actorDict = {
+  '@': Player,
+  '=': HorizontalFireball,
+  'o': Coin,
+  'v': FireRain
+}
+const parser = new LevelParser(actorDict);
+runGame(schemas, parser, DOMDisplay)
+  .then(() => console.log('Вы выиграли приз!'));
