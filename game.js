@@ -15,6 +15,7 @@ class Vector {
     return new Vector(x, y);
   }
   times(n) {
+    // const
     let x = this.x * n;
     let y = this.y * n;
     return new Vector(x, y);
@@ -54,12 +55,18 @@ class Actor {
     return 'actor';
   }
   isIntersect(actor) {
+    // первая половина проверки не нужна
     if (!actor || !(actor instanceof Actor)) {
       throw new Error(`Необходим объект типа Actor`);
     }
     if (actor === this) {
       return false;
     }
+    // внешние скобки можно убрать
+    // отрицание можно внести в скобки
+    // для этого нужно заменить || на &&
+    // и операторы на противоположные
+    // <= на > и >= на <
     return (!(this.left >= actor.right || this.right <= actor.left || this.top >= actor.bottom || this.bottom <= actor.top));
   }
 }
@@ -144,6 +151,10 @@ class LevelParser {
   }
 
   actorFromSymbol(symbol) {
+    // форматирование
+    // лучше добавить в конструкторе значение по-умолчанию
+    // для аргумента dictionary,
+    // чтобы не проверять каждый раз перед использованием
   	//Вернет undefined, если не передать символ
   	if (this.dictionary) {//!!!
     return this.dictionary[symbol];
