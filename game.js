@@ -15,8 +15,8 @@ class Vector {
     return new Vector(x, y);
   }
   times(n) {
-    let x = this.x * n;
-    let y = this.y * n;
+    const x = this.x * n;//const
+    const y = this.y * n;//const
     return new Vector(x, y);
   }
 }
@@ -54,13 +54,15 @@ class Actor {
     return 'actor';
   }
   isIntersect(actor) {
-    if (!actor || !(actor instanceof Actor)) {
+    // if (!actor || !(actor instanceof Actor)) {
+    if (!(actor instanceof Actor)) {
       throw new Error(`Необходим объект типа Actor`);
     }
     if (actor === this) {
       return false;
     }
-    return (!(this.left >= actor.right || this.right <= actor.left || this.top >= actor.bottom || this.bottom <= actor.top));
+    // return (!(this.left >= actor.right || this.right <= actor.left || this.top >= actor.bottom || this.bottom <= actor.top));
+    return (this.left < actor.right && this.right > actor.left && this.top < actor.bottom && this.bottom > actor.top);
   }
 }
 
@@ -139,15 +141,16 @@ class Level {
 const symbols = { 'x': 'wall', '!': 'lava' }; 
 
 class LevelParser {
-  constructor(dictionary) {
+  // constructor(dictionary) {
+  constructor(dictionary = {}) {
     this.dictionary = dictionary;
   }
 
   actorFromSymbol(symbol) {
   	//Вернет undefined, если не передать символ
-  	if (this.dictionary) {//!!!
+  	// if (this.dictionary) {//!!!
     return this.dictionary[symbol];
-  }
+  // }
 }
   obstacleFromSymbol(symbol) {
     return symbols[symbol];
@@ -238,10 +241,6 @@ class FireRain extends Fireball {
     this.initPos = pos;
   }
 
-  get type() {
-    return 'firerain';
-  }
-
   handleObstacle() {
     this.pos = this.initPos;
   }
@@ -292,8 +291,8 @@ const schemas = [
     '         '
   ],
   [
-    '      v  ',
-    '    v    ',
+    '      *  ',
+    '         ',
     '  v      ',
     '        o',
     '        x',
@@ -306,7 +305,8 @@ const actorDict = {
   '@': Player,
   '=': HorizontalFireball,
   'o': Coin,
-  'v': FireRain
+  'v': FireRain,
+  '*': VerticalFireball//
 }
 const parser = new LevelParser(actorDict);
 runGame(schemas, parser, DOMDisplay)
