@@ -15,8 +15,8 @@ class Vector {
     return new Vector(x, y);
   }
   times(n) {
-    const x = this.x * n;//const
-    const y = this.y * n;//const
+    const x = this.x * n;
+    const y = this.y * n;
     return new Vector(x, y);
   }
 }
@@ -54,14 +54,12 @@ class Actor {
     return 'actor';
   }
   isIntersect(actor) {
-    // if (!actor || !(actor instanceof Actor)) {
     if (!(actor instanceof Actor)) {
       throw new Error(`Необходим объект типа Actor`);
     }
     if (actor === this) {
       return false;
     }
-    // return (!(this.left >= actor.right || this.right <= actor.left || this.top >= actor.bottom || this.bottom <= actor.top));
     return (this.left < actor.right && this.right > actor.left && this.top < actor.bottom && this.bottom > actor.top);
   }
 }
@@ -72,7 +70,6 @@ class Level {
     this.actors = actors;
     this.player = this.actors.find(actor => actor.type === 'player');
     this.height = grid.length;
-    //Ширина пустого уровня равна 0!!!
     this.width = Math.max(0, ...(this.grid.map(el => el.length)));
     this.status = null;
     this.finishDelay = 1;
@@ -141,17 +138,13 @@ class Level {
 const symbols = { 'x': 'wall', '!': 'lava' }; 
 
 class LevelParser {
-  // constructor(dictionary) {
   constructor(dictionary = {}) {
     this.dictionary = dictionary;
   }
 
   actorFromSymbol(symbol) {
-  	//Вернет undefined, если не передать символ
-  	// if (this.dictionary) {//!!!
     return this.dictionary[symbol];
-  // }
-}
+  }
   obstacleFromSymbol(symbol) {
     return symbols[symbol];
   }
@@ -159,7 +152,6 @@ class LevelParser {
     return strings.map(string => string.split('')).map(line => line.map(symbol => this.obstacleFromSymbol(symbol)));
   }
   createActors(strings) {
-  	//Вернет пустой массив, если не определить символы движущихся объектов!!!
     return strings.reduce((rez, itemY, y) => {
       itemY.split('').forEach((itemX, x) => {
         const constructor = this.actorFromSymbol(itemX);
@@ -174,9 +166,6 @@ class LevelParser {
     },[]);
 }
   parse(strings) {
-  	//Высота уровня будет равна количеству строк плана!!!
-  	//Ширина уровня будет равна количеству символов в максимальной строке плана!!!
-  	//Создаст уровень с припятствиями из плана!!!
     return new Level(this.createGrid(strings), this.createActors(strings));
   }
 }
@@ -184,7 +173,6 @@ class LevelParser {
 // 4. Игрок
 class Player extends Actor {
   constructor(pos = new Vector(0, 0)) {
-  	// лучше не менять значения аргументов функции?
     const realPos = pos.plus(new Vector(0, -0.5));
     super(realPos, new Vector(0.8, 1.5), new Vector(0, 0));
   }
@@ -249,7 +237,6 @@ class FireRain extends Fireball {
 // Монета
 class Coin extends Actor {
   constructor(pos = new Vector(0, 0)) {
-  	// лучше не менять значения аргументов функции?
   	const realPos = pos.plus(new Vector(0.2, 0.1));
     super(realPos, new Vector(0.6, 0.6));
     this.springSpeed = 8;
@@ -268,7 +255,6 @@ class Coin extends Actor {
     return new Vector(0, Math.sin(this.spring) * this.springDist);
   }
   getNextPosition(time = 1) {
-  	//Увеличивается вектор исходной позиции, а не текущей!!!
     this.updateSpring(time);
     return this.startPos.plus(this.getSpringVector());
   }
@@ -306,7 +292,7 @@ const actorDict = {
   '=': HorizontalFireball,
   'o': Coin,
   'v': FireRain,
-  '*': VerticalFireball//
+  '*': VerticalFireball
 }
 const parser = new LevelParser(actorDict);
 runGame(schemas, parser, DOMDisplay)
